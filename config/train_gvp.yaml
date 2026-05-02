@@ -1,0 +1,122 @@
+model:  
+  encoder:   ##
+    node_embedder:
+      pocket_encoder:
+        max_num_atoms: 15
+        max_aa_types: 22
+        max_relpos: 16
+        top_k_neighbors: 8
+        feat_dim: 128
+        rbf_num_bins: 16
+        use_atom_presence_flag: true
+        normalize_vectors: true
+        add_distance_rbf: true
+        node_hidden_dim_scalar: 128
+        node_hidden_dim_vector: 16
+        edge_hidden_dim_scalar: 128
+        edge_hidden_dim_vector: 16
+        dropout: 0.2
+        num_encoder_layers: 2
+      peptide_encoder:
+        max_num_atoms: 15
+        max_aa_types: 22
+        max_relpos: 16
+        top_k_neighbors: 8
+        feat_dim: 128
+        rbf_num_bins: 16
+        use_atom_presence_flag: true
+        normalize_vectors: true
+        add_distance_rbf: true
+        node_hidden_dim_scalar: 128
+        node_hidden_dim_vector: 16
+        edge_hidden_dim_scalar: 128
+        edge_hidden_dim_vector: 16
+        dropout: 0.2 #
+        num_encoder_layers: 2
+    edge_embedder:
+      max_num_atoms: 15
+      max_aa_types: 22
+      max_relpos: 16
+      feat_dim: 64
+      normalize_vectors: true
+      edge_hidden_dim_scalar: 128
+      edge_hidden_dim_vector: 16
+    ipa:
+      c_s: 128 #${model.node_embed_size}
+      c_z: 64 #${model.edge_embed_size}#
+      c_hidden: 128
+      no_heads: 8
+      no_qk_points: 8
+      no_v_points: 12
+      seq_tfmr_num_heads: 4
+      seq_tfmr_num_layers: 2
+      num_blocks: 6
+      stop_grad: False
+  interpolant:
+    min_t: 1.e-2
+    t_normalization_clip: 0.9
+    sample_sequence: True
+    sample_structure: True
+    sample_dist: True
+    dist:
+      mode: CA # minimal
+      threshold: 10.0
+      dist_min: 0
+      dist_max: 20.0
+      num_bins: 64
+      use_onehot: True
+    rots:
+      train_schedule: linear
+      sample_schedule: exp
+      exp_rate: 10
+    trans:
+      train_schedule: linear
+      sample_schedule: linear
+      sigma: 1.0
+    seqs:
+      num_classes: 20
+      simplex_value: 5.0
+    sampling:
+      num_timesteps: 100
+    self_condition: False
+
+train:
+  loss_weights:
+    trans_loss: 0.5 # 1.0 for dreamfold, 0.05 for yim
+    rot_loss: 0.5 # 1.0 for dreamfold, 0.5 for yim
+    bb_atom_loss: 0.25
+    seqs_loss: 1.0
+    angle_loss: 1.0
+    torsion_loss: 0.5
+
+  max_iters: 20000000
+  val_freq: 20000   
+  batch_size: 4         # 32
+  accum_grad: 1
+  seed: 114514
+  max_grad_norm: 100.0
+  optimizer:
+    type: adam
+    lr: 3.e-4 #1.e-4    # 1e-4
+    weight_decay: 0.0
+    beta1: 0.9
+    beta2: 0.999
+  scheduler:
+    type: plateau
+    factor: 0.8
+    patience: 10
+    min_lr: 1.e-6
+
+dataset:
+  train:
+    type: peprec
+    structure_dir: /data5_large/home/yanzh/deeplearn/diffpep_bak/Da/Dataset/PepMerge_release/
+    dataset_dir: /data5_large/home/yanzh/deeplearn/diffpep_bak/Da/Dataset/cached
+    name: pep_pocket_train
+    reset: False
+  val:
+    type: peprec
+    structure_dir: /data5_large/home/yanzh/deeplearn/diffpep_bak/Da/Dataset/PepMerge_release/
+    dataset_dir: /data5_large/home/yanzh/deeplearn/diffpep_bak/Da/Dataset/cached
+    name: pep_pocket_test
+    reset: False
