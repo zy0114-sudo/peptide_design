@@ -15,4 +15,6 @@
 <img width="1425" height="744" alt="image" src="https://github.com/user-attachments/assets/b6c4d613-777d-4fcf-9342-98c4853334c2" />
 
 ## Train 
-If the model needs to be retrained,"sbatch train.slurm"
+```bash
+sbatch train.slurm
+```
