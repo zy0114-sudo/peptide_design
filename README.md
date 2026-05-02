@@ -1,5 +1,6 @@
 # peptide_design
-##Description: Full-atom design of peptides targeting protein pockets
+
+## Description: Full-atom design of peptides targeting protein pockets
 
 ## Flow model
 <img width="1431" height="693" alt="image" src="https://github.com/user-attachments/assets/be88b8ba-1d6d-40e4-81b1-79f8bec341c4" />
